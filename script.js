@@ -1,20 +1,22 @@
 const vertexShaderSource = `#version 300 es
 
 in vec4 a_position;
+in vec4 a_color;
+out vec4 v_color;
 
 void main() {
     gl_Position = a_position;
+    v_color = a_color;
 }
 `;
 
 const fragmentShaderSource = `#version 300 es
 precision highp float;
-
-uniform vec4 u_color;
+in vec4 v_color;
 out vec4 outColor;
 
 void main() {
-    outColor = u_color;
+    outColor = v_color;
 }
 `;
 
@@ -63,62 +65,37 @@ const main = () => {
     fragmentShaderSource
   );
 
-  // Link the two shaders into a program
-  const program = createProgram(gl, vertexShader, fragmentShader);
-
-  // Look up where the vertex data needs to do
-  const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-
-  // Create a buffer and put the three 2D clip space points in it
-
-  const positionBuffer = gl.createBuffer();
-
-  // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-  const positions = [0, 0, 0, 0.5, 0.9, 0, -0.7, -0.5, 0, -0.7, 0.5, 0];
-
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-
-  // Vertex Array Object
-  const vao = gl.createVertexArray();
-
-  gl.bindVertexArray(vao);
-
-  gl.enableVertexAttribArray(positionAttributeLocation);
-
-  let size = 2;
-  let type = gl.FLOAT;
-  let normalize = false;
-  let stride = 0;
-  let offset = 0;
-  gl.vertexAttribPointer(
-    positionAttributeLocation,
-    size,
-    type,
-    normalize,
-    stride,
-    offset
-  );
-
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // Clear the canvas
-  gl.clearColor(0, 0, 0, 0);
-  gl.clear(gl.COLOR_BUFFER_BIT);
-
+  const program = createProgram(gl, vertexShader, fragmentShader);
   gl.useProgram(program);
 
+  const positionLoc = gl.getAttribLocation(program, "a_position");
+  const colorLoc = gl.getAttribLocation(program, "a_color");
+
+  // Create first object
+  const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
 
-  // Set a random color
-  const colorLocation = gl.getUniformLocation(program, "u_color");
-  gl.uniform4f(colorLocation, Math.random(), Math.random(), Math.random(), 1);
-  const primitiveType = gl.TRIANGLES;
-  const count = positions.length / size;
-  gl.drawArrays(primitiveType, offset, count);
+  const vbo = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array([
+      // x, y, r, g, b
+      0, 0, 1, 0, 0, 0, 0.5, 0, 1, 0, 0.9, 0, 0, 0, 1,
+    ]),
+    gl.STATIC_DRAW
+  );
+
+  gl.enableVertexAttribArray(positionLoc);
+  gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 20, 0);
+
+  gl.enableVertexAttribArray(colorLoc);
+  gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 20, 8);
+
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
 };
 
 main();
