@@ -1,28 +1,16 @@
-const vertexShaderSource = `#version 300 es
+const loadShaderFile = async (filePath) => {
+  const response = await fetch(filePath);
+  if (!response.ok) {
+    throw new Error(`Failed to load shader file: ${filePath}`);
+  }
+  return response.text();
+};
 
-in vec4 a_position;
-in vec4 a_color;
-out vec4 v_color;
-
-void main() {
-    gl_Position = a_position;
-    v_color = a_color;
-}
-`;
-
-const fragmentShaderSource = `#version 300 es
-precision highp float;
-in vec4 v_color;
-out vec4 outColor;
-
-void main() {
-    outColor = v_color;
-}
-`;
-
-const createShader = (gl, type, source) => {
+const createShader = async (gl, type, filename) => {
   const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
+
+  const shaderSource = await loadShaderFile(filename);
+  gl.shaderSource(shader, shaderSource);
   gl.compileShader(shader);
   const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
 
@@ -47,7 +35,7 @@ const createProgram = (gl, vertexShader, fragmentShader) => {
   gl.deleteProgram(program);
 };
 
-const main = () => {
+const main = async () => {
   const canvas = document.querySelector("#canvas");
 
   const gl = canvas.getContext("webgl2");
@@ -58,11 +46,15 @@ const main = () => {
 
   // create GLSL shaders, upload the GLSL source, compile the shaders
 
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-  const fragmentShader = createShader(
+  const vertexShader = await createShader(
+    gl,
+    gl.VERTEX_SHADER,
+    "vertexShader.vert"
+  );
+  const fragmentShader = await createShader(
     gl,
     gl.FRAGMENT_SHADER,
-    fragmentShaderSource
+    "fragmentShader.frag"
   );
 
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
@@ -84,7 +76,7 @@ const main = () => {
     gl.ARRAY_BUFFER,
     new Float32Array([
       // x, y, r, g, b
-      0, 0, 1, 0, 0, 0, 0.5, 0, 1, 0, 0.9, 0, 0, 0, 1,
+      -1, -1, 1, 0, 0, -1, 1, 0, 1, 0, 1, -1, 0, 0, 1,
     ]),
     gl.STATIC_DRAW
   );
