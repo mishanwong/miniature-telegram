@@ -1,10 +1,23 @@
 #version 300 es
 
-in vec4 a_position;
-in vec4 a_color;
-out vec4 v_color;
+in vec2 a_position;
+in vec2 a_texCoord;
+
+uniform vec2 u_resolution;
+
+out vec2 v_texCoord;
 
 void main() {
-    gl_Position = a_position;
-    v_color = a_color;
+
+    // Convert the position from pixels to between 0.0 and 1.0
+    vec2 zeroToOne = a_position / u_resolution;
+
+    // Convert from [0, 1] to [0, 2]
+    vec2 zeroToTwo = zeroToOne * 2.0;
+
+    // Convert from [0, 1] to [-1, 1] (clipspace)
+    vec2 clipSpace = zeroToTwo - 1.0;
+
+    gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+    v_texCoord = a_texCoord;
 }
