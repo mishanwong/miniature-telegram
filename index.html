@@ -14,7 +14,55 @@
   </head>
   <body>
     <h1>Learning WebGL</h1>
-    <canvas id="canvas"></canvas>
+    <div class="container">
+      <label
+        for="x-slider"
+        class="slider-label"
+        >X:</label
+      >
+      <input
+        type="range"
+        id="x-slider"
+        min="0"
+        max="800"
+        step="1"
+        value="0"
+      />
+      <span id="x-display">0</span>
+    </div>
+    <div class="container">
+      <label
+        for="y-slider"
+        class="slider-label"
+        >Y:</label
+      >
+      <input
+        type="range"
+        id="y-slider"
+        min="0"
+        max="800"
+        step="1"
+        value="0"
+      />
+      <span id="y-display">0</span>
+    </div>
+    <div class="container">
+      <label
+        for="angle-slider"
+        class="slider-label"
+        >angle:</label
+      >
+      <input
+        type="range"
+        id="angle-slider"
+        min="0"
+        max="360"
+        step="1"
+        value="0"
+      />
+      <span id="angle-display">0</span>
+    </div>
+    <canvas id="canvas"> </canvas>
     <script src="webgl-utils.js"></script>
     <script src="script.js"></script>
   </body>

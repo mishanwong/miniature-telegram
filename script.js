@@ -35,30 +35,29 @@ const createProgram = (gl, vertexShader, fragmentShader) => {
   gl.deleteProgram(program);
 };
 
-function setRectangle(gl, x, y, width, height) {
-  var x1 = x;
-  var x2 = x + width;
-  var y1 = y;
-  var y2 = y + height;
+function setGeometry(gl) {
   gl.bufferData(
     gl.ARRAY_BUFFER,
-    // new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]),
-    new Float32Array([x1, y1, x1, y2, x2, y1, x2, y2]),
+    new Float32Array([
+      // left column
+      0, 0, 30, 0, 0, 150, 0, 150, 30, 0, 30, 150,
+
+      // top rung
+      30, 0, 100, 0, 30, 30, 30, 30, 100, 0, 100, 30,
+
+      // middle rung
+      30, 60, 67, 60, 30, 90, 30, 90, 67, 60, 67, 90,
+    ]),
     gl.STATIC_DRAW
   );
 }
 
-const main = async (image) => {
+const main = async () => {
   const canvas = document.querySelector("#canvas");
-
   const gl = canvas.getContext("webgl2");
-
   if (!gl) {
     return;
   }
-
-  // create GLSL shaders, upload the GLSL source, compile the shaders
-
   const vertexShader = await createShader(
     gl,
     gl.VERTEX_SHADER,
@@ -70,19 +69,13 @@ const main = async (image) => {
     "fragmentShader.frag"
   );
 
-  webglUtils.resizeCanvasToDisplaySize(gl.canvas);
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
   const program = createProgram(gl, vertexShader, fragmentShader);
-  gl.useProgram(program);
 
-  // Look up where the vertex data needs to go
   const positionLoc = gl.getAttribLocation(program, "a_position");
-  const texCoordLoc = gl.getAttribLocation(program, "a_texCoord");
-
-  // Look up uniform locations
   const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
-  const imageLoc = gl.getUniformLocation(program, "u_image");
+  const colorLoc = gl.getUniformLocation(program, "u_color");
+  const translationLoc = gl.getUniformLocation(program, "u_translation");
+  const rotationLoc = gl.getUniformLocation(program, "u_rotation");
 
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
@@ -93,46 +86,58 @@ const main = async (image) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
   gl.vertexAttribPointer(positionLoc, 2, gl.FLOAT, false, 0, 0);
 
-  const texCoordBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    new Float32Array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
-    gl.STATIC_DRAW
-  );
+  setGeometry(gl);
+  let xValue = 0;
+  let yValue = 0;
+  let angleValue = 0;
 
-  gl.enableVertexAttribArray(texCoordLoc);
-  gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+  const drawScene = () => {
+    webglUtils.resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-  // Create a texture
-  const texture = gl.createTexture();
-  gl.activeTexture(gl.TEXTURE0);
+    gl.useProgram(program);
 
-  // Bind texture to texture unit 0 2D bind point
-  gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.bindVertexArray(vao);
+    gl.uniform2f(resolutionLoc, gl.canvas.width, gl.canvas.height);
+    gl.uniform2f(translationLoc, xValue, yValue);
+    gl.uniform3fv(colorLoc, [0.5, 0, 0.5]);
+    const rad = (angleValue * Math.PI) / 180;
+    const rotationMatrix = [
+      Math.cos(rad),
+      -Math.sin(rad),
+      Math.sin(rad),
+      Math.cos(rad),
+    ];
+    gl.uniformMatrix2fv(rotationLoc, false, rotationMatrix);
 
-  // Set the texture parameters
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.drawArrays(gl.TRIANGLES, 0, 18);
+  };
+  drawScene();
 
-  // Upload the image into the texture
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  const xSlider = document.getElementById("x-slider");
+  const ySlider = document.getElementById("y-slider");
+  const angleSlider = document.getElementById("angle-slider");
+  const xDisplay = document.getElementById("x-display");
+  const yDisplay = document.getElementById("y-display");
+  const angleDisplay = document.getElementById("angle-display");
 
-  // Pass in the canvas resolution so we can convert from pixels to clip space in the shader
-  gl.uniform2f(resolutionLoc, gl.canvas.width, gl.canvas.height);
+  xSlider.addEventListener("input", (e) => {
+    xValue = e.target.value;
+    xDisplay.innerText = xValue;
+    drawScene();
+  });
 
-  // Tell the shader to get the texture from texture unit 0
-  gl.uniform1i(imageLoc, 0);
+  ySlider.addEventListener("input", () => {
+    yValue = ySlider.value;
+    yDisplay.innerText = yValue;
+    drawScene();
+  });
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-  // Set a rectanglethe same size as the image
-  setRectangle(gl, 0, 0, image.width, image.height);
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  angleSlider.addEventListener("input", () => {
+    angleValue = angleSlider.value;
+    angleDisplay.innerText = angleValue;
+    drawScene();
+  });
 };
-const image = new Image();
-image.src = "leaves.png";
-image.onload = () => main(image);
+
+main();
