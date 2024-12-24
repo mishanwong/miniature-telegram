@@ -48,23 +48,75 @@
     </div>
     <div class="container">
       <label
-        for="angle-slider"
+        for="z-slider"
         class="slider-label"
-        >angle:</label
+        >Z:</label
       >
       <input
         type="range"
-        id="angle-slider"
+        id="z-slider"
+        min="0"
+        max="800"
+        step="1"
+        value="0"
+      />
+      <span id="z-display">0</span>
+    </div>
+
+    <div class="container">
+      <label
+        for="x-rotate-slider"
+        class="slider-label"
+        >xRotate:</label
+      >
+      <input
+        type="range"
+        id="x-rotate-slider"
         min="0"
         max="360"
         step="1"
         value="0"
       />
-      <span id="angle-display">0</span>
+      <span id="x-rotate-display">0</span>
     </div>
+
     <div class="container">
       <label
-        for="scale-x-slider"
+        for="y-rotate-slider"
+        class="slider-label"
+        >yRotate:</label
+      >
+      <input
+        type="range"
+        id="y-rotate-slider"
+        min="0"
+        max="360"
+        step="1"
+        value="0"
+      />
+      <span id="y-rotate-display">0</span>
+    </div>
+
+    <div class="container">
+      <label
+        for="z-rotate-slider"
+        class="slider-label"
+        >zRotate:</label
+      >
+      <input
+        type="range"
+        id="z-rotate-slider"
+        min="0"
+        max="360"
+        step="1"
+        value="0"
+      />
+      <span id="z-rotate-display">0</span>
+    </div>
+
+    <div class="container">
+      <label
+        for="x-rotate-slider"
         class="slider-label"
         >scaleX:</label
       >
@@ -93,6 +145,23 @@
         value="1"
       />
       <span id="scale-y-display">1</span>
+    </div>
+
+    <div class="container">
+      <label
+        for="scale-z-slider"
+        class="slider-label"
+        >scaleZ:</label
+      >
+      <input
+        type="range"
+        id="scale-z-slider"
+        min="-5"
+        max="5"
+        step="0.01"
+        value="1"
+      />
+      <span id="scale-z-display">1</span>
     </div>
     <canvas id="canvas"> </canvas>
     <script src="webgl-utils.js"></script>
