@@ -53,6 +53,9 @@ function setGeometry(gl) {
 }
 
 const m3 = {
+  identity: function () {
+    return [1, 0, 0, 0, 1, 0, 0, 0, 1];
+  },
   multiply: function (a, b) {
     var a00 = a[0 * 3 + 0];
     var a01 = a[0 * 3 + 1];
@@ -98,6 +101,22 @@ const m3 = {
   scaling: function (sx, sy) {
     return [sx, 0, 0, 0, sy, 0, 0, 0, 1];
   },
+  projection: function (width, height) {
+    // Note: This matrix flips the Y axis so that 0 is at the top.
+    return [2 / width, 0, 0, 0, -2 / height, 0, -1, 1, 1];
+  },
+
+  translate: function (m, tx, ty) {
+    return m3.multiply(m, m3.translation(tx, ty));
+  },
+
+  rotate: function (m, angleInRadians) {
+    return m3.multiply(m, m3.rotation(angleInRadians));
+  },
+
+  scale: function (m, sx, sy) {
+    return m3.multiply(m, m3.scaling(sx, sy));
+  },
 };
 
 const main = async () => {
@@ -120,7 +139,6 @@ const main = async () => {
   const program = createProgram(gl, vertexShader, fragmentShader);
 
   const positionLoc = gl.getAttribLocation(program, "a_position");
-  const resolutionLoc = gl.getUniformLocation(program, "u_resolution");
   const colorLoc = gl.getUniformLocation(program, "u_color");
   const matrixLoc = gl.getUniformLocation(program, "u_matrix");
 
@@ -149,18 +167,14 @@ const main = async () => {
     gl.bindVertexArray(vao);
 
     gl.uniform3fv(colorLoc, [0.5, 0, 0.5]);
-    gl.uniform2f(resolutionLoc, gl.canvas.width, gl.canvas.height);
 
     const rad = (angle * Math.PI) / 180;
 
-    // Compute the matrices
-    const translationMatrix = m3.translation(tx, ty);
-    const rotationMatrix = m3.rotation(rad);
-    const scaleMatrix = m3.scaling(sx, sy);
-
     // Multiply the matrices
-    let matrix = m3.multiply(translationMatrix, rotationMatrix);
-    matrix = m3.multiply(matrix, scaleMatrix);
+    let matrix = m3.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
+    matrix = m3.translate(matrix, tx, ty);
+    matrix = m3.rotate(matrix, rad);
+    matrix = m3.scale(matrix, sx, sy);
 
     gl.uniformMatrix3fv(matrixLoc, false, matrix);
 
