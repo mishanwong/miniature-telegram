@@ -3,13 +3,13 @@
 in vec2 a_position;
 
 uniform vec2 u_resolution;
-uniform vec2 u_translation;
-uniform mat2 u_rotation;
+uniform mat3 u_matrix;
 
 out vec3 v_color;
 
 void main() {
-    vec2 position = u_rotation * a_position + u_translation;
+
+    vec2 position = (u_matrix * vec3(a_position, 1)).xy;
 
     // Convert the position from pixels to between 0.0 and 1.0
     vec2 zeroToOne = position / u_resolution;

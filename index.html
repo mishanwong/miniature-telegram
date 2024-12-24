@@ -62,6 +62,38 @@
       />
       <span id="angle-display">0</span>
     </div>
+    <div class="container">
+      <label
+        for="scale-x-slider"
+        class="slider-label"
+        >scaleX:</label
+      >
+      <input
+        type="range"
+        id="scale-x-slider"
+        min="-5"
+        max="5"
+        step="0.01"
+        value="1"
+      />
+      <span id="scale-x-display">1</span>
+    </div>
+    <div class="container">
+      <label
+        for="scale-y-slider"
+        class="slider-label"
+        >scaleY:</label
+      >
+      <input
+        type="range"
+        id="scale-y-slider"
+        min="-5"
+        max="5"
+        step="0.01"
+        value="1"
+      />
+      <span id="scale-y-display">1</span>
+    </div>
     <canvas id="canvas"> </canvas>
     <script src="webgl-utils.js"></script>
     <script src="script.js"></script>
