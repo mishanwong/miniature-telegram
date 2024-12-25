@@ -251,6 +251,29 @@ const m4 = {
       1,
     ];
   },
+  perspective: function (fieldOfViewInRadians, aspect, near, far) {
+    var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
+    var rangeInv = 1.0 / (near - far);
+
+    return [
+      f / aspect,
+      0,
+      0,
+      0,
+      0,
+      f,
+      0,
+      0,
+      0,
+      0,
+      (near + far) * rangeInv,
+      -1,
+      0,
+      0,
+      near * far * rangeInv * 2,
+      0,
+    ];
+  },
   multiply: function (a, b) {
     var b00 = b[0 * 4 + 0];
     var b01 = b[0 * 4 + 1];
@@ -356,6 +379,9 @@ const main = async () => {
   let sy = 1;
   let sz = 1;
 
+  const degToRad = (deg) => {
+    return (deg * Math.PI) / 180;
+  };
   const drawScene = () => {
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
@@ -367,16 +393,17 @@ const main = async () => {
 
     gl.bindVertexArray(vao);
 
-    const radX = (rx * Math.PI) / 180;
-    const radY = (ry * Math.PI) / 180;
-    const radZ = (rz * Math.PI) / 180;
+    const radX = degToRad(rx);
+    const radY = degToRad(ry);
+    const radZ = degToRad(rz);
+    const fov = degToRad(110);
 
     // Multiply the matrices
-    let matrix = m4.projection(
-      gl.canvas.clientWidth,
-      gl.canvas.clientHeight,
-      400
-    );
+    const w = gl.canvas.clientWidth;
+    const h = gl.canvas.clientHeight;
+    const aspect = w / h;
+    let matrix = m4.perspective(fov, aspect, 1, 2000);
+    // let matrix = m4.orthographic(0, w, h, 0, 400, -400);
     matrix = m4.translate(matrix, tx, ty, tz);
     matrix = m4.xRotate(matrix, radX);
     matrix = m4.yRotate(matrix, radY);
