@@ -403,7 +403,6 @@ const main = async () => {
     const h = gl.canvas.clientHeight;
     const aspect = w / h;
     let matrix = m4.perspective(fov, aspect, 1, 2000);
-    // let matrix = m4.orthographic(0, w, h, 0, 400, -400);
     matrix = m4.translate(matrix, tx, ty, tz);
     matrix = m4.xRotate(matrix, radX);
     matrix = m4.yRotate(matrix, radY);
