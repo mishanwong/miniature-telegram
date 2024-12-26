@@ -1,7 +1,6 @@
 export const renderObj = (gl, program, buffers) => {
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
-
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexBuffer);
   const positionLoc = gl.getAttribLocation(program, "a_position");
 
