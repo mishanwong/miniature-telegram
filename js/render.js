@@ -20,7 +20,7 @@ export const renderObj = (gl, program, buffers) => {
 
   // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
   // gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
-  gl.drawArrays(gl.QUADS, 0, 24);
+  gl.drawArrays(gl.TRIANGLES, 0, 36);
 };
 
 export const renderAxis = (gl, program) => {};

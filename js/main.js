@@ -35,13 +35,12 @@ const main = async () => {
 
   const objText = await loadObj("../assets/cube.obj");
   const objData = parseObj(objText);
-  // console.log(objData.vertices);
-  // const buffers = setupObjBuffers(gl, objData);
+  const buffers = setupObjBuffers(gl, objData);
 
   const w = gl.canvas.width;
   const h = gl.canvas.height;
   gl.enable(gl.DEPTH_TEST);
-  // gl.enable(gl.CULL_FACE);
+  gl.enable(gl.CULL_FACE);
 
   // Set up MVP Matrices
 
@@ -51,7 +50,7 @@ const main = async () => {
   const mvpMatrix = mat4.create();
 
   // Configure he view matrix (camera)
-  const eye = [0, 0, 3];
+  const eye = [0, 0, 5];
   const look = [0, 0, 0];
   const up = [0, 1, 0];
   mat4.lookAt(viewMatrix, eye, look, up);
@@ -72,31 +71,7 @@ const main = async () => {
   const colorLoc = gl.getUniformLocation(program, "u_color");
   gl.uniform4fv(colorLoc, [0, 0, 1, 1]);
 
-  // renderObj(gl, program, buffers);
-
-  const vertexBuffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.bufferData(
-    gl.ARRAY_BUFFER,
-    // new Float32Array([
-    //   0.5, 0.5, 0, 0.5, -0.5, 0, -0.5, -0.5, 0,
-
-    //   -0.7, 0.7, -0.7, -0.2, 0.2, 0, -0.7, 0.2, 0,
-    // ]),
-    new Float32Array([
-      1, 1, 0, 1, -1, 0, -1, -1, 0, 1, 1, 0, -1, -1, 0, -1, 1, 0,
-    ]),
-    gl.STATIC_DRAW
-  );
-
-  const vao = gl.createVertexArray();
-  gl.bindVertexArray(vao);
-
-  const positionLoc = gl.getAttribLocation(program, "a_position");
-  gl.enableVertexAttribArray(positionLoc);
-  gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
-
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  renderObj(gl, program, buffers);
 };
 
 main();
