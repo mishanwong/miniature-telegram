@@ -3,7 +3,7 @@ import { degToRad } from "./utils.js";
 import { loadObj } from "./loaders.js";
 import { parseObj } from "./parsers.js";
 import { setupObjBuffers, setupListeners } from "./setup.js";
-import { renderObj } from "./render.js";
+import { renderObj, renderAxis } from "./render.js";
 import { resizeCanvasToDisplaySize } from "./utils.js";
 import { mat4 } from "https://cdn.skypack.dev/gl-matrix";
 
@@ -49,13 +49,11 @@ const main = async () => {
 
   // Set up MVP Matrices
 
-  const colorLoc = gl.getUniformLocation(program, "u_color");
-  gl.uniform4fv(colorLoc, [0, 0, 1, 1]);
-
   applyTransformation();
 };
 
 const drawScene = () => {
+  // renderAxis(gl, program);
   renderObj(gl, program, buffers);
 };
 
@@ -74,7 +72,6 @@ export const applyTransformation = () => {
     translationMatrix,
     transformations.translations
   );
-  mat4.multiply(modelMatrix, modelMatrix, translationMatrix); // Apply the translation
 
   // 1 (b) Rotation
   const rotationMatrix = mat4.create();
@@ -98,17 +95,18 @@ export const applyTransformation = () => {
   );
 
   // Combine rotations (order Z * Y * X)
-  mat4.multiply(rotationMatrix, rotationZMatrix, rotationYMatrix); // Z * Y
+  mat4.multiply(rotationMatrix, rotationYMatrix, rotationZMatrix); // Z * Y
   mat4.multiply(rotationMatrix, rotationMatrix, rotationXMatrix); // (Z * Y) * X
-
-  mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
 
   // 1 (c) Scaling
   const scalingMatrix = mat4.create();
   mat4.scale(scalingMatrix, scalingMatrix, transformations.scaling);
 
-  mat4.multiply(modelMatrix, modelMatrix, scalingMatrix);
+  // Combine the transformation
 
+  mat4.multiply(modelMatrix, modelMatrix, rotationMatrix);
+  mat4.multiply(modelMatrix, modelMatrix, translationMatrix); // Apply the translation
+  mat4.multiply(modelMatrix, modelMatrix, scalingMatrix);
   // Configure he view matrix (camera)
   const eye = [0, 0, 5];
   const look = [0, 0, 0];
@@ -126,8 +124,8 @@ export const applyTransformation = () => {
   mat4.perspective(projectionMatrix, fov, aspect, near, far);
 
   // Combining Model-View-Projection matrices
-  mat4.multiply(mvpMatrix, modelMatrix, viewMatrix); // View x Model
-  mat4.multiply(mvpMatrix, projectionMatrix, mvpMatrix); // Projection x (View x Model)
+  mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
+  mat4.multiply(mvpMatrix, mvpMatrix, modelMatrix);
 
   const matrixLoc = gl.getUniformLocation(program, "u_modelviewprojection");
   gl.uniformMatrix4fv(matrixLoc, false, mvpMatrix);
