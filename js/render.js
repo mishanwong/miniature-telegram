@@ -12,10 +12,10 @@ export const renderObj = (gl, program, buffers) => {
   // gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
   // gl.enableVertexAttribArray(normalLoc);
 
-  // gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texCoordBuffer);
-  // const texCoordLoc = gl.getAttribLocation(program, "a_texCoord");
-  // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
-  // gl.enableVertexAttribArray(texCoordLoc);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffers.texCoordBuffer);
+  const texCoordLoc = gl.getAttribLocation(program, "a_texCoord");
+  gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(texCoordLoc);
 
   // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffers.indexBuffer);
   // gl.drawElements(gl.TRIANGLES, 24, gl.UNSIGNED_SHORT, 0);
@@ -77,8 +77,8 @@ export const renderAxis = (gl, program) => {
   gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 6 * 4, 0);
   gl.enableVertexAttribArray(positionLoc);
 
-  const colorLoc = gl.getAttribLocation(program, "a_color");
-  gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
-  gl.enableVertexAttribArray(colorLoc);
+  // const colorLoc = gl.getAttribLocation(program, "a_color");
+  // gl.vertexAttribPointer(colorLoc, 3, gl.FLOAT, false, 6 * 4, 3 * 4);
+  // gl.enableVertexAttribArray(colorLoc);
   gl.drawArrays(gl.LINES, 0, 6);
 };

@@ -15,26 +15,41 @@ export const parseObj = (objText) => {
 
     if (type === "v") {
       vertices.push([...parts.slice(1).map(Number)]);
+    } else if (type === "vt") {
+      texCoords.push([...parts.slice(1).map(Number)]);
     } else if (type === "f") {
       const faces = parts.slice(1);
-      let faceIndex = [];
+      let vIndices = [];
+      let vtIndices = [];
+      let vnIndices = [];
       for (let i = 0; i < 4; i++) {
-        const [vIndex, ,] = faces[i].split("/").map((idx) => Number(idx) - 1);
-        faceIndex.push(vIndex);
+        const [vIndex, vtIndex, vnIndex] = faces[i]
+          .split("/")
+          .map((idx) => Number(idx) - 1);
+        vIndices.push(vIndex);
+        vtIndices.push(vtIndex);
+        vnIndices.push(vnIndices);
       }
+      vertexData.push(vertices[vIndices[0]]);
+      vertexData.push(vertices[vIndices[1]]);
+      vertexData.push(vertices[vIndices[2]]);
+      vertexData.push(vertices[vIndices[0]]);
+      vertexData.push(vertices[vIndices[2]]);
+      vertexData.push(vertices[vIndices[3]]);
 
-      vertexData.push(vertices[faceIndex[0]]);
-      vertexData.push(vertices[faceIndex[1]]);
-      vertexData.push(vertices[faceIndex[2]]);
-      vertexData.push(vertices[faceIndex[0]]);
-      vertexData.push(vertices[faceIndex[2]]);
-      vertexData.push(vertices[faceIndex[3]]);
+      texCoordData.push(texCoords[vtIndices[0]]);
+      texCoordData.push(texCoords[vtIndices[1]]);
+      texCoordData.push(texCoords[vtIndices[2]]);
+      texCoordData.push(texCoords[vtIndices[0]]);
+      texCoordData.push(texCoords[vtIndices[2]]);
+      texCoordData.push(texCoords[vtIndices[3]]);
     }
   }
+  console.log(texCoordData);
   return {
     vertices: new Float32Array(vertexData.flat()),
     // normals: new Float32Array(normalData),
-    // texCoords: new Float32Array(texCoordData),
+    texCoords: new Float32Array(texCoordData.flat()),
     // indices: new Uint16Array(indices),
   };
 };

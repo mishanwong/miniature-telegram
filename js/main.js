@@ -47,8 +47,6 @@ const main = async () => {
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
 
-  // Set up MVP Matrices
-
   applyTransformation();
 };
 
