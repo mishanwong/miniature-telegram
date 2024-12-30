@@ -59,6 +59,7 @@ export const applyTransformation = () => {
   // Create matrics
   const modelMatrix = mat4.create();
   const viewMatrix = mat4.create();
+  const modelViewMatrix = mat4.create();
   const projectionMatrix = mat4.create();
   const mvpMatrix = mat4.create();
 
@@ -124,9 +125,23 @@ export const applyTransformation = () => {
   // Combining Model-View-Projection matrices
   mat4.multiply(mvpMatrix, projectionMatrix, viewMatrix);
   mat4.multiply(mvpMatrix, mvpMatrix, modelMatrix);
+  mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix);
 
-  const matrixLoc = gl.getUniformLocation(program, "u_modelviewprojection");
-  gl.uniformMatrix4fv(matrixLoc, false, mvpMatrix);
+  // Create normal matrix
+  const normalMatrix = mat4.create();
+  mat4.invert(normalMatrix, modelViewMatrix);
+  mat4.transpose(normalMatrix, normalMatrix);
+
+  const mvpLoc = gl.getUniformLocation(program, "u_modelviewprojection");
+  const modelMatrixLoc = gl.getUniformLocation(program, "u_model");
+  const viewMatrixLoc = gl.getUniformLocation(program, "u_view");
+  const projectionMatrixLoc = gl.getUniformLocation(program, "u_projection");
+  const normalMatrixLoc = gl.getUniformLocation(program, "u_normal_matrix");
+  gl.uniformMatrix4fv(modelMatrixLoc, false, modelMatrix);
+  gl.uniformMatrix4fv(viewMatrixLoc, false, viewMatrix);
+  gl.uniformMatrix4fv(projectionMatrixLoc, false, projectionMatrix);
+  gl.uniformMatrix4fv(mvpLoc, false, mvpMatrix);
+  gl.uniformMatrix4fv(normalMatrixLoc, false, normalMatrix);
 
   drawScene();
 };

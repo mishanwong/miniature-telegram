@@ -2,7 +2,6 @@ export const parseObj = (objText) => {
   const vertices = [];
   const texCoords = [];
   const normals = [];
-  const indices = [];
 
   const vertexData = [];
   const normalData = [];
@@ -17,6 +16,8 @@ export const parseObj = (objText) => {
       vertices.push([...parts.slice(1).map(Number)]);
     } else if (type === "vt") {
       texCoords.push([...parts.slice(1).map(Number)]);
+    } else if (type === "vn") {
+      normals.push([...parts.slice(1).map(Number)]);
     } else if (type === "f") {
       const faces = parts.slice(1);
       let vIndices = [];
@@ -28,7 +29,7 @@ export const parseObj = (objText) => {
           .map((idx) => Number(idx) - 1);
         vIndices.push(vIndex);
         vtIndices.push(vtIndex);
-        vnIndices.push(vnIndices);
+        vnIndices.push(vnIndex);
       }
       vertexData.push(vertices[vIndices[0]]);
       vertexData.push(vertices[vIndices[1]]);
@@ -43,13 +44,18 @@ export const parseObj = (objText) => {
       texCoordData.push(texCoords[vtIndices[0]]);
       texCoordData.push(texCoords[vtIndices[2]]);
       texCoordData.push(texCoords[vtIndices[3]]);
+
+      normalData.push(normals[vnIndices[0]]);
+      normalData.push(normals[vnIndices[1]]);
+      normalData.push(normals[vnIndices[2]]);
+      normalData.push(normals[vnIndices[0]]);
+      normalData.push(normals[vnIndices[2]]);
+      normalData.push(normals[vnIndices[3]]);
     }
   }
-  console.log(texCoordData);
   return {
     vertices: new Float32Array(vertexData.flat()),
-    // normals: new Float32Array(normalData),
+    normals: new Float32Array(normalData.flat()),
     texCoords: new Float32Array(texCoordData.flat()),
-    // indices: new Uint16Array(indices),
   };
 };

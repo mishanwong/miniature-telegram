@@ -35,9 +35,9 @@ export const setupObjBuffers = (gl, objData) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, objData.vertices, gl.STATIC_DRAW);
 
-  // const normalBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-  // gl.bufferData(gl.ARRAY_BUFFER, objData.normals, gl.STATIC_DRAW);
+  const normalBuffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+  gl.bufferData(gl.ARRAY_BUFFER, objData.normals, gl.STATIC_DRAW);
 
   const texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
@@ -52,7 +52,7 @@ export const setupObjBuffers = (gl, objData) => {
   // );
 
   // return { vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer };
-  return { vertexBuffer, texCoordBuffer };
+  return { vertexBuffer, normalBuffer, texCoordBuffer };
 };
 
 export const setupListeners = (tfm) => {
