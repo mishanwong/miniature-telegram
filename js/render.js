@@ -1,4 +1,4 @@
-export const renderObj = (gl, program, buffers) => {
+export const renderObj = (gl, program, buffers, vertexCount) => {
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
   gl.bindBuffer(gl.ARRAY_BUFFER, buffers.vertexBuffer);
@@ -16,7 +16,7 @@ export const renderObj = (gl, program, buffers) => {
   // gl.vertexAttribPointer(texCoordLoc, 2, gl.FLOAT, false, 0, 0);
   // gl.enableVertexAttribArray(texCoordLoc);
 
-  gl.drawArrays(gl.TRIANGLES, 0, 36);
+  gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 };
 
 export const renderAxis = (gl, program) => {

@@ -16,6 +16,10 @@ let canvas;
 let gl;
 let program;
 let buffers;
+let vertexCount;
+let objMin;
+let objMax;
+let objMean;
 
 const main = async () => {
   canvas = document.querySelector("#canvas");
@@ -40,21 +44,25 @@ const main = async () => {
   gl.useProgram(program);
 
   setupListeners(transformations);
-  const objText = await loadObj("../assets/cube.obj");
+  const objText = await loadObj("../assets/plant.obj");
   const objData = parseObj(objText);
+  vertexCount = objData.vertexCount;
+  objMin = objData.min;
+  objMax = objData.max;
+  objMean = objData.mean.map(Number);
   buffers = setupObjBuffers(gl, objData);
 
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
 
+  console.log(objMean);
   applyTransformation();
 };
 
 const drawScene = () => {
   // renderAxis(gl, program);
-  renderObj(gl, program, buffers);
+  renderObj(gl, program, buffers, vertexCount);
 };
-
 export const applyTransformation = () => {
   // Create matrics
   const modelMatrix = mat4.create();
@@ -71,7 +79,7 @@ export const applyTransformation = () => {
     translationMatrix,
     transformations.translations
   );
-
+  mat4.translate(translationMatrix, translationMatrix, [0, -1.5, 0]);
   // 1 (b) Rotation
   const rotationMatrix = mat4.create();
   const rotationXMatrix = mat4.create();
@@ -100,6 +108,7 @@ export const applyTransformation = () => {
   // 1 (c) Scaling
   const scalingMatrix = mat4.create();
   mat4.scale(scalingMatrix, scalingMatrix, transformations.scaling);
+  mat4.scale(scalingMatrix, scalingMatrix, [0.5, 0.5, 0.5]);
 
   // Combine the transformation
 
@@ -107,7 +116,7 @@ export const applyTransformation = () => {
   mat4.multiply(modelMatrix, modelMatrix, translationMatrix); // Apply the translation
   mat4.multiply(modelMatrix, modelMatrix, scalingMatrix);
   // Configure he view matrix (camera)
-  const eye = [0, 0, 5];
+  const eye = [0, 0, 10];
   const look = [0, 0, 0];
   const up = [0, 1, 0];
   mat4.lookAt(viewMatrix, eye, look, up);

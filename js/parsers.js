@@ -8,12 +8,27 @@ export const parseObj = (objText) => {
   const texCoordData = [];
   const lines = objText.split("\n");
 
+  let xmin = Infinity;
+  let ymin = Infinity;
+  let zmin = Infinity;
+  let xmax = -Infinity;
+  let ymax = -Infinity;
+  let zmax = -Infinity;
+
   for (const line of lines) {
     const parts = line.trim().split(/\s+/);
     const type = parts[0];
 
     if (type === "v") {
-      vertices.push([...parts.slice(1).map(Number)]);
+      const vert = parts.slice(1).map(Number);
+      const [x, y, z] = vert;
+      xmin = Math.min(x, xmin);
+      ymin = Math.min(y, ymin);
+      zmin = Math.min(z, zmin);
+      xmax = Math.max(x, xmax);
+      ymax = Math.max(y, ymax);
+      zmax = Math.max(z, zmax);
+      vertices.push(vert);
     } else if (type === "vt") {
       texCoords.push([...parts.slice(1).map(Number)]);
     } else if (type === "vn") {
@@ -53,9 +68,27 @@ export const parseObj = (objText) => {
       normalData.push(normals[vnIndices[3]]);
     }
   }
+  let xmean = ((xmin + xmax) / 2).toFixed(2);
+  let ymean = ((ymin + ymax) / 2).toFixed(2);
+  let zmean = ((zmin + zmax) / 2).toFixed(2);
+  xmin = xmin.toFixed(2);
+  ymin = ymin.toFixed(2);
+  zmin = zmin.toFixed(2);
+  xmax = xmax.toFixed(2);
+  ymax = ymax.toFixed(2);
+  zmax = zmax.toFixed(2);
+  console.log(`
+    Obj file range: [${xmin}, ${ymin}, ${zmin} -> ${xmax}, ${ymax}, ${zmax}]
+    Obj file center: [${xmean}, ${ymean}, ${zmean}]
+    Vertex count: ${vertexData.length}
+    `);
   return {
     vertices: new Float32Array(vertexData.flat()),
     normals: new Float32Array(normalData.flat()),
     texCoords: new Float32Array(texCoordData.flat()),
+    vertexCount: vertexData.length,
+    min: [xmin, ymin, zmin],
+    max: [xmax, ymax, zmax],
+    mean: [xmean, ymean, zmean],
   };
 };
