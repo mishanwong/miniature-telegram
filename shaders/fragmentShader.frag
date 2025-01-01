@@ -5,6 +5,10 @@ in vec3 vN;
 in vec3 vL;
 in vec3 vE;
 
+uniform vec3 uKa;
+uniform vec3 uKd;
+uniform vec3 uKs;
+
 const float u_Ka = 0.5;
 const float u_Kd = 0.9;
 const float u_Ks = 0.9;

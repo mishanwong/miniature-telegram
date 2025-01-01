@@ -1,17 +1,7 @@
-export const loadShaderFile = async (filePath) => {
-  const response = await fetch(filePath);
+export const loadFile = async (url) => {
+  const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`Failed to load shader file: ${filePath}`);
+    throw new Error(`Failed to load file: ${url}`);
   }
   return response.text();
-};
-
-export const loadObj = async (url) => {
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Failed to load ${url}`);
-  }
-
-  return await response.text();
 };

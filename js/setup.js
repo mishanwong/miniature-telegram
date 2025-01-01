@@ -1,10 +1,10 @@
-import { loadShaderFile } from "./loaders.js";
+import { loadFile } from "./loaders.js";
 import { applyTransformation } from "./main.js";
 
 export const createShader = async (gl, type, filename) => {
   const shader = gl.createShader(type);
 
-  const shaderSource = await loadShaderFile(filename);
+  const shaderSource = await loadFile(filename);
   gl.shaderSource(shader, shaderSource);
   gl.compileShader(shader);
   const success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
@@ -33,25 +33,28 @@ export const createProgram = (gl, vertexShader, fragmentShader) => {
 export const setupObjBuffers = (gl, objData) => {
   const vertexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, objData.vertices, gl.STATIC_DRAW);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(objData.vertices),
+    gl.STATIC_DRAW
+  );
 
   const normalBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, objData.normals, gl.STATIC_DRAW);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(objData.normals),
+    gl.STATIC_DRAW
+  );
 
   const texCoordBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, texCoordBuffer);
-  gl.bufferData(gl.ARRAY_BUFFER, objData.texCoords, gl.STATIC_DRAW);
+  gl.bufferData(
+    gl.ARRAY_BUFFER,
+    new Float32Array(objData.texCoords),
+    gl.STATIC_DRAW
+  );
 
-  // const indexBuffer = gl.createBuffer();
-  // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-  // gl.bufferData(
-  //   gl.ELEMENT_ARRAY_BUFFER,
-  //   new Uint16Array(objData.indices),
-  //   gl.STATIC_DRAW
-  // );
-
-  // return { vertexBuffer, normalBuffer, texCoordBuffer, indexBuffer };
   return { vertexBuffer, normalBuffer, texCoordBuffer };
 };
 

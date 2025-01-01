@@ -1,12 +1,16 @@
 export const parseObj = (objText) => {
+  const objData = {};
+
   const vertices = [];
   const texCoords = [];
   const normals = [];
 
-  const vertexData = [];
-  const normalData = [];
-  const texCoordData = [];
+  let vertexData = [];
+  let normalData = [];
+  let texCoordData = [];
   const lines = objText.split("\n");
+
+  let currentGroup;
 
   let xmin = Infinity;
   let ymin = Infinity;
@@ -33,6 +37,21 @@ export const parseObj = (objText) => {
       texCoords.push([...parts.slice(1).map(Number)]);
     } else if (type === "vn") {
       normals.push([...parts.slice(1).map(Number)]);
+    } else if (type === "usemtl") {
+      const group = parts.slice(1)[0];
+      if (group !== currentGroup) {
+        if (currentGroup) {
+          objData[currentGroup] = {
+            vertices: vertexData.flat(),
+            normals: normalData.flat(),
+            texCoords: texCoordData.flat(),
+          };
+          vertexData = [];
+          normalData = [];
+          texCoordData = [];
+        }
+        currentGroup = group;
+      }
     } else if (type === "f") {
       const faces = parts.slice(1);
       let vIndices = [];
@@ -46,6 +65,7 @@ export const parseObj = (objText) => {
         vtIndices.push(vtIndex);
         vnIndices.push(vnIndex);
       }
+
       vertexData.push(vertices[vIndices[0]]);
       vertexData.push(vertices[vIndices[1]]);
       vertexData.push(vertices[vIndices[2]]);
@@ -82,13 +102,44 @@ export const parseObj = (objText) => {
     Obj file center: [${xmean}, ${ymean}, ${zmean}]
     Vertex count: ${vertexData.length}
     `);
-  return {
-    vertices: new Float32Array(vertexData.flat()),
-    normals: new Float32Array(normalData.flat()),
-    texCoords: new Float32Array(texCoordData.flat()),
-    vertexCount: vertexData.length,
-    min: [xmin, ymin, zmin],
-    max: [xmax, ymax, zmax],
-    mean: [xmean, ymean, zmean],
+  objData[currentGroup] = {
+    vertices: vertexData.flat(),
+    normals: normalData.flat(),
+    texCoords: texCoordData.flat(),
   };
+  return { objData };
+};
+
+export const parseMtl = (mtlText) => {
+  const material = {};
+  let currentMaterial;
+
+  const lines = mtlText.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    // Skip comments and blank lines
+    if (line === "" || line.startsWith("#")) continue;
+    const parts = line.split(/\s+/);
+    const attribute = parts[0];
+    const data = parts.slice(1);
+    if (attribute === "newmtl") {
+      material[data] = {};
+      currentMaterial = data[0];
+    } else {
+      switch (attribute) {
+        case "Ns":
+          material[currentMaterial]["Ns"] = parseFloat(data[0]);
+        case "Ka":
+          material[currentMaterial]["Ka"] = data.map(Number);
+        case "Kd":
+          material[currentMaterial]["Kd"] = data.map(Number);
+        case "Ks":
+          material[currentMaterial]["Ks"] = data.map(Number);
+        case "illum":
+          material[currentMaterial]["illum"] = parseInt(data[0]);
+      }
+    }
+  }
+  return material;
 };

@@ -1,9 +1,9 @@
 import { createShader, createProgram } from "./setup.js";
 import { degToRad } from "./utils.js";
-import { loadObj } from "./loaders.js";
-import { parseObj } from "./parsers.js";
+import { loadFile } from "./loaders.js";
+import { parseObj, parseMtl } from "./parsers.js";
 import { setupObjBuffers, setupListeners } from "./setup.js";
-import { renderObj, renderAxis } from "./render.js";
+import { renderObj } from "./render.js";
 import { resizeCanvasToDisplaySize } from "./utils.js";
 import { mat4 } from "https://cdn.skypack.dev/gl-matrix";
 
@@ -15,11 +15,13 @@ const transformations = {
 let canvas;
 let gl;
 let program;
-let buffers;
-let vertexCount;
+let buffers = {};
+let objData;
+let materials;
 let objMin;
 let objMax;
 let objMean;
+let vertexCount = {};
 
 const main = async () => {
   canvas = document.querySelector("#canvas");
@@ -44,24 +46,33 @@ const main = async () => {
   gl.useProgram(program);
 
   setupListeners(transformations);
-  const objText = await loadObj("../assets/plant.obj");
-  const objData = parseObj(objText);
-  vertexCount = objData.vertexCount;
-  objMin = objData.min;
-  objMax = objData.max;
-  objMean = objData.mean.map(Number);
-  buffers = setupObjBuffers(gl, objData);
+
+  const objText = await loadFile("../assets/plant.obj");
+  const mtlText = await loadFile("../assets/plant.mtl");
+  objData = parseObj(objText).objData;
+  materials = parseMtl(mtlText);
+  for (let group in objData) {
+    const bufs = setupObjBuffers(gl, objData[group]);
+    buffers[group] = bufs;
+    vertexCount[group] = objData[group].vertices.length / 3;
+  }
+  // objMin = objData.min;
+  // objMax = objData.max;
+  // objMean = objData.mean.map(Number);
+  // vertexCount = objData.vertices["IDP_Pot"].length / 3;
+  // console.log(objData);
+  // buffers = setupObjBuffers(gl, objData);
+
+  //materials = parseMtl(mtlText);
 
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
 
-  console.log(objMean);
   applyTransformation();
 };
 
 const drawScene = () => {
-  // renderAxis(gl, program);
-  renderObj(gl, program, buffers, vertexCount);
+  renderObj(gl, program, buffers, materials, vertexCount);
 };
 export const applyTransformation = () => {
   // Create matrics
