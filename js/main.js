@@ -56,15 +56,6 @@ const main = async () => {
     buffers[group] = bufs;
     vertexCount[group] = objData[group].vertices.length / 3;
   }
-  // objMin = objData.min;
-  // objMax = objData.max;
-  // objMean = objData.mean.map(Number);
-  // vertexCount = objData.vertices["IDP_Pot"].length / 3;
-  // console.log(objData);
-  // buffers = setupObjBuffers(gl, objData);
-
-  //materials = parseMtl(mtlText);
-
   gl.enable(gl.DEPTH_TEST);
   gl.enable(gl.CULL_FACE);
 

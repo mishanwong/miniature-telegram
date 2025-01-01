@@ -141,5 +141,12 @@ export const parseMtl = (mtlText) => {
       }
     }
   }
+  material["IDP_root"]["color"] = [0.36, 0.2, 0.05]; // Brown
+  material["IDP_ground"]["color"] = [0.92, 0.56, 0.21]; // Orange
+  material["IDP_leaves"]["color"] = [0.73, 0.96, 0.58]; //Apple green
+  material["IDP_leaves_indoor_plant_2_NOR.jpg"]["color"] = [0.11, 0.22, 0.09]; // Dark green
+  material["IDP_root_indoor_plant_2_NOR.jpg"]["color"] = [0.2, 0.32, 0.84]; // Blue
+  material["IDP_Pot"]["color"] = [0.92, 0.21, 0.51]; // Pink
+
   return material;
 };

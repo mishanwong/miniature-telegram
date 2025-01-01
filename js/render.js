@@ -23,17 +23,17 @@ const renderGroup = (gl, program, buffer, material, vertexCount) => {
   const uKsLoc = gl.getUniformLocation(program, "uKs");
   const uKaLoc = gl.getUniformLocation(program, "uKa");
   const uKdLoc = gl.getUniformLocation(program, "uKd");
+  const colorLoc = gl.getUniformLocation(program, "color");
 
   // Set uniforms
-
   gl.uniform3fv(uKsLoc, material["Ks"]);
   gl.uniform3fv(uKaLoc, material["Ka"]);
   gl.uniform3fv(uKdLoc, material["Kd"]);
+  gl.uniform3fv(colorLoc, new Float32Array(material["color"]));
 
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer.normalBuffer);
   const normalLoc = gl.getAttribLocation(program, "a_normal");
   gl.vertexAttribPointer(normalLoc, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(normalLoc);
-  console.log(`Drawing ${vertexCount}`);
   gl.drawArrays(gl.TRIANGLES, 0, vertexCount);
 };

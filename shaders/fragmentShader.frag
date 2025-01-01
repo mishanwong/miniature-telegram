@@ -8,13 +8,11 @@ in vec3 vE;
 uniform vec3 uKa;
 uniform vec3 uKd;
 uniform vec3 uKs;
+uniform vec3 color;
 
-const float u_Ka = 0.5;
-const float u_Kd = 0.9;
-const float u_Ks = 0.9;
 const float u_Shininess = 250.;
-const vec3 myColor = vec3(0.5, 0.01, 0.);
 const vec3 SPECULARCOLOR = vec3( 1., 1., 1. );
+const vec3 ambientLight = vec3(1., 1., 1.);
 
 out vec4 outColor;
 
@@ -25,10 +23,10 @@ void main() {
     vec3 Light = normalize(vL);
     vec3 Eye = normalize(vE);
 
-    vec3 ambient = u_Ka * myColor;
+    vec3 ambient = uKa * color;
 
     float diffuse_factor = max(dot(Normal, Light) , 0.); // between 0 and 1
-    vec3 diffuse = u_Kd * diffuse_factor * myColor;
+    vec3 diffuse = uKd * diffuse_factor * color;
 
     float specular_factor = 0.;
     if (diffuse_factor > 0.) {
@@ -38,7 +36,7 @@ void main() {
             specular_factor = pow(max(cosphi, 0.), u_Shininess);
         }
     }
-    vec3 specular = u_Ks * specular_factor * SPECULARCOLOR.rgb;
+    vec3 specular = uKs * specular_factor * SPECULARCOLOR.rgb;
 
     outColor = vec4(ambient + diffuse + specular, 1.);
 }
